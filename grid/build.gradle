@@ -1,0 +1,56 @@
+plugins {
+  id 'java'
+  id 'scala'
+  id 'distribution'
+}
+
+repositories {
+	jcenter()
+}
+
+distributions {
+	main {
+		contents {
+			into ('lib') {
+				from jar
+				from(project.configurations.runtime)
+			}
+		}
+	}
+}
+
+sourceCompatibility = 1.8
+
+group = 'com.github.joshuaar.grid'
+version = '0.0.1'
+
+ext {
+  scalaMajorVersion = '2.12'
+  scalaMinorVersion = '8'
+  scalaVersion = "${scalaMajorVersion}.${scalaMinorVersion}"
+}
+
+dependencies {
+
+  compile "org.scala-lang:scala-library:${scalaVersion}"
+  compile "org.scala-lang:scala-reflect:${scalaVersion}"
+  compile group: 'com.typesafe.akka', name: 'akka-actor_2.12', version: '2.5.21'
+
+  // ------------------------------------------------------------
+  // Testing
+
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.assertj:assertj-core:3.6.1'
+  testCompile 'org.mockito:mockito-core:1.10.19'
+
+  testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.1"
+}
+
+
+task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
+  main = 'org.scalatest.tools.Runner'
+  args = ['-R', 'build/classes/test', '-o']
+  classpath = sourceSets.test.runtimeClasspath
+}
+
+test.dependsOn scalaTest
